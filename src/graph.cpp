@@ -1,51 +1,51 @@
 #include "graph.h"
 
-// default constructor
-Graph::CityGraph::CityGraph() {}
-
-void Graph::CityGraph::import()
+Graph::CityGraph::CityGraph()
 {
-	// property mapping, gv file -> graph_t
-	// node name
-	boost::property_map<graph_t, boost::vertex_name_t>::type name =
-		get(boost::vertex_name, city_graph);
-	dprop.property("node_id", name);
+	// initialize property mapping
+	init_dynamic_property();
 
-	boost::property_map<graph_t, boost::vertex_color_t>::type mass =
-		get(boost::vertex_color, city_graph);
-	dprop.property("mass", mass);
+	// create tempfile for visualization
+	char *tempname = strdup("/tmp/dotXXXXXX");
+	mkstemp(tempname);
+	dot_temp = tempname;
+}
 
-	boost::property_map<graph_t, boost::edge_weight_t>::type weight =
-		get(boost::edge_weight, city_graph);
-	dprop.property("weight", weight);
+Graph::CityGraph::~CityGraph()
+{
+	// remove(viz_temp.c_str());
+}
 
-	// Sample graph as an std::istream;
-	std::istringstream gvgraph("digraph G \n\
-		{\n\
-		\n\
-		v21->v11;\n\
-		v21->v12;\n\
-		v21->v13;\n\
-		\n\
-		v11->v21;\n\
-		v21->v11;\n\
-		v11->v22;\n\
-		v11->v23;\n\
-		\n\
-		v21->v22;\n\
-		v22->v23;\n\
-		v23->v21;\n\
-		\n\
-		v21->v31;\n\
-		v21->v32;\n\
-		v21->v33;\n\
-		\n\
-		v32->v41;\n\
-		v32->v42;\n\
-		v33->v43;\n\
-		}");
+void Graph::CityGraph::init_dynamic_property()
+{
+	// boost dynamic property mapping, used by graphviz functions
+	// node properties
+	auto node_name = get(&Node::name, city_graph);
+	dprop.property("node_id", node_name);
 
-	bool status = boost::read_graphviz(gvgraph, city_graph, dprop);
+	auto node_label = get(&Node::label, city_graph);
+	dprop.property("label", node_label);
+
+	// edge properties
+	auto edge_name = get(&Edge::name, city_graph);
+	dprop.property("name", edge_name);
+
+	auto edge_label = get(&Edge::label, city_graph);
+	dprop.property("label", edge_label);
+}
+
+void Graph::CityGraph::import(std::string dot_file)
+{
+	// file to import
+	std::ifstream dot_stream(dot_file);
+
+	// import graphviz
+	bool status = boost::read_graphviz(dot_stream, city_graph, dprop);
+	dot_stream.close();
+
+	if (!status) {
+		throw "Couldn't load graphviz file.";
+	}
 }
 
 void Graph::CityGraph::print()
@@ -55,4 +55,99 @@ void Graph::CityGraph::print()
 			  << std::endl;
 	std::cout << "Number of vertices: " << boost::num_vertices(city_graph)
 			  << std::endl;
+
+	std::cout << "\nList of vertices:" << std::endl;
+	city_graph_t::vertex_iterator vertex_it, vertex_it_end;
+	std::tie(vertex_it, vertex_it_end) = boost::vertices(city_graph);
+	for (; vertex_it != vertex_it_end; ++vertex_it) {
+		std::cout << "Vertex [" << *vertex_it
+				  << "] name: " << city_graph[*vertex_it].name << std::endl;
+	}
+
+	std::cout << "\nList of edges:" << std::endl;
+	city_graph_t::edge_iterator edge_it, edge_it_end;
+	std::tie(edge_it, edge_it_end) = boost::edges(city_graph);
+	for (; edge_it != edge_it_end; ++edge_it) {
+		std::cout << "Edge [" << *edge_it
+				  << "] name: " << city_graph[*edge_it].name << std::endl;
+	}
+}
+
+std::string Graph::CityGraph::regenerate_dot()
+{
+	// create/update dot tempfile from city_graph
+	std::fstream dot_tempfile_stream(dot_temp);
+	boost::write_graphviz_dp(dot_tempfile_stream, city_graph, dprop);
+	dot_tempfile_stream.close();
+
+#ifndef NDEBUG
+	// show it to user
+	system((std::string(DOT_VIEWER) + " " + dot_temp + "> /dev/null 2>&1 &").c_str());
+#endif
+
+	return dot_temp;
+}
+
+Graph::CityGraph::city_graph_t::vertex_descriptor
+Graph::CityGraph::find_node(std::string name)
+{
+	city_graph_t::vertex_iterator vertex_it, vertex_it_end;
+	std::tie(vertex_it, vertex_it_end) = boost::vertices(city_graph);
+	for (; vertex_it != vertex_it_end; ++vertex_it) {
+		if (name == city_graph[*vertex_it].name) {
+			return *vertex_it;
+		}
+	}
+	throw "Node " + name + "doesn't exist!";
+}
+
+std::list<Graph::CityGraph::city_graph_t::edge_descriptor>
+Graph::CityGraph::get_route(city_graph_t::vertex_descriptor from,
+							city_graph_t::vertex_descriptor to)
+{
+	// output list
+	std::list<city_graph_t::edge_descriptor> path(0);
+
+	// create real storage for Dijkstra output
+	std::vector<city_graph_t::vertex_descriptor> predecessors(
+		boost::num_vertices(city_graph)); // to store route precessors
+	std::vector<uint64_t> distances(
+		boost::num_vertices(city_graph)); // to store distances
+
+	// named parameters for dijkstra
+	auto indexMap = boost::get(boost::vertex_index, city_graph);
+	auto weightMap = boost::get(&Edge::weight, city_graph);
+	auto predecessorMap =
+		boost::make_iterator_property_map(predecessors.begin(), indexMap);
+	auto distanceMap =
+		boost::make_iterator_property_map(distances.begin(), indexMap);
+
+	// run dijkstra
+	boost::dijkstra_shortest_paths(city_graph, from,
+								   boost::vertex_index_map(indexMap)
+									   .weight_map(weightMap)
+									   .predecessor_map(predecessorMap)
+									   .distance_map(distanceMap));
+
+	// walk back on predecessor map and get shortest path
+	// u (predecessor) -> v
+	// if predecessorMap[v] = v then v is source (see docs)
+	city_graph_t::vertex_descriptor u = predecessorMap[to];
+	city_graph_t::vertex_descriptor v = to;
+	for (; v != u; v = u, u = predecessorMap[u]) {
+		path.push_front(boost::edge(u, v, city_graph).first);
+	}
+
+#ifndef NDEBUG
+	// print path found
+	std::cout << "Path found: from " << city_graph[from].name << " to "
+			  << city_graph[to].name << std::endl;
+	std::cout << "	";
+	for (auto &edge_p : path) {
+		std::cout << " -> " << city_graph[edge_p].name;
+	}
+	std::cout << std::endl;
+#endif
+
+	return path;
 }

@@ -10,9 +10,6 @@ ENDIF()
 
 project (TrafficSim)
 
-# do release build by default
-set(CMAKE_BUILD_TYPE Release)
-
 # c++11 support required
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
@@ -29,5 +26,5 @@ endif()
 find_package(Boost 1.40 COMPONENTS graph REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
 
-add_executable(TrafficSim src/main.cpp src/graph.cpp)
+add_executable(TrafficSim src/main.cpp src/graph.cpp src/vehicle.cpp)
 target_link_libraries(TrafficSim ${Boost_LIBRARIES})

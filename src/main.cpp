@@ -11,7 +11,9 @@
 int main(int argc, char const *argv[])
 {
 	Graph::CityGraph graph;
-	graph.import();
+	graph.import("../pokus.dot");
 	graph.print();
+	graph.regenerate_dot();
+	graph.get_route(graph.find_node("v21"), graph.find_node("v23"));
 	return 0;
 }
