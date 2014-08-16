@@ -1,4 +1,10 @@
 #include "graph.h"
+#include <boost/graph/graphviz.hpp>
+#include <boost/graph/dijkstra_shortest_paths.hpp>
+#include <iostream>
+#include <vector>
+#include <string.h>
+#include <cstdlib>
 
 Graph::CityGraph::CityGraph()
 {
@@ -20,10 +26,10 @@ void Graph::CityGraph::init_dynamic_property()
 {
 	// boost dynamic property mapping, used by graphviz functions
 	// node properties
-	auto node_name = get(&Node::name, city_graph);
+	auto node_name = get(&Vertex::name, city_graph);
 	dprop.property("node_id", node_name);
 
-	auto node_label = get(&Node::label, city_graph);
+	auto node_label = get(&Vertex::label, city_graph);
 	dprop.property("label", node_label);
 
 	// edge properties
@@ -75,20 +81,17 @@ void Graph::CityGraph::print()
 
 std::string Graph::CityGraph::regenerate_dot()
 {
+	// @todo: regenerate design traits
+
 	// create/update dot tempfile from city_graph
 	std::fstream dot_tempfile_stream(dot_temp);
 	boost::write_graphviz_dp(dot_tempfile_stream, city_graph, dprop);
 	dot_tempfile_stream.close();
 
-#ifndef NDEBUG
-	// show it to user
-	system((std::string(DOT_VIEWER) + " " + dot_temp + "> /dev/null 2>&1 &").c_str());
-#endif
-
 	return dot_temp;
 }
 
-Graph::CityGraph::city_graph_t::vertex_descriptor
+Graph::CityGraph::vertex_descriptor
 Graph::CityGraph::find_node(std::string name)
 {
 	city_graph_t::vertex_iterator vertex_it, vertex_it_end;
@@ -98,12 +101,11 @@ Graph::CityGraph::find_node(std::string name)
 			return *vertex_it;
 		}
 	}
-	throw "Node " + name + "doesn't exist!";
+	throw "Vertex " + name + "doesn't exist!";
 }
 
-std::list<Graph::CityGraph::city_graph_t::edge_descriptor>
-Graph::CityGraph::get_route(city_graph_t::vertex_descriptor from,
-							city_graph_t::vertex_descriptor to)
+std::list<Graph::CityGraph::edge_descriptor>
+Graph::CityGraph::get_route(vertex_descriptor from, vertex_descriptor to)
 {
 	// output list
 	std::list<city_graph_t::edge_descriptor> path(0);
@@ -150,4 +152,16 @@ Graph::CityGraph::get_route(city_graph_t::vertex_descriptor from,
 #endif
 
 	return path;
+}
+
+Graph::CityGraph::Vertex &Graph::CityGraph::
+operator[](Graph::CityGraph::vertex_descriptor vertex)
+{
+	return city_graph[vertex];
+}
+
+Graph::CityGraph::Edge &Graph::CityGraph::
+operator[](Graph::CityGraph::edge_descriptor edge)
+{
+	return city_graph[edge];
 }

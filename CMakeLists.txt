@@ -26,5 +26,5 @@ endif()
 find_package(Boost 1.40 COMPONENTS graph REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
 
-add_executable(TrafficSim src/main.cpp src/graph.cpp src/vehicle.cpp)
+add_executable(TrafficSim src/main.cpp src/graph.cpp src/vehicle.cpp src/trafficsim.cpp)
 target_link_libraries(TrafficSim ${Boost_LIBRARIES})
