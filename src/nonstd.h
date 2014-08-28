@@ -1,16 +1,20 @@
 /**
  * @brief Handy fuctions
- * @details [long description]
+ * @details Several handy things I was missing from std.
  *
  */
 #include <cstdint>
 #include <limits>
+#include <string>
+#include <vector>
+#include <sstream>
 
 namespace nonstd
 {
 /**
  * @brief Fast simple string hash (Bernstein?)
- * @details Compile-time hash. Src: http://stackoverflow.com/a/7869639
+ * @details Compile-time hash. Src: http://stackoverflow.com/a/7869639 (with
+ *changes)
  *
  * @param s string to hash
  * @param off used for obfucation compilers
@@ -40,5 +44,29 @@ constexpr T pack(const char *s, unsigned int off = 0)
 			!s[off])
 			   ? 0
 			   : (((T)s[off] << (Bits * off)) | pack<T, Bits>(s, off + 1));
+}
+/**
+ * @brief Splits string into array
+ * @details Splits (tokenize) string into tokens separed by delimiter.
+ *
+ * @param str string to tokenize
+ * @param delim delimiter
+ *
+ * @return separed tokens
+ */
+std::vector<std::string> split(const std::string &str, char delim)
+{
+	// create stream from input
+	std::stringstream ss(str);
+
+	// tokens to return
+	std::vector<std::string> tokens;
+
+	std::string token;
+	while (std::getline(ss, token, delim)) {
+		tokens.push_back(token);
+	}
+
+	return tokens;
 }
 }

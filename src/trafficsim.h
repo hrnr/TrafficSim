@@ -11,11 +11,11 @@ class TrafficSimulation
 {
   public:
 	TrafficSimulation(std::string graph_in, std::string vehicles_in);
-	void run(const bool show_visualisation);
+	void run(const bool show_visualisation, const int& simulation_speed);
 
   private:
-	// defined in vehicle.h
-	class Vehicle;
+	class Vehicle; // defined in vehicle.h
+
 	void import_vehicles(std::string vehicles_file);
 	void show_visualisation();
 

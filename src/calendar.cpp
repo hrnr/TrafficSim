@@ -3,13 +3,23 @@
 */
 #ifdef CALENDAR_H
 
+#ifndef NDEBUG
+#include <iostream>
+#endif
+
 namespace Simulation
 {
 template <typename SimulationEvent>
 void Calendar<SimulationEvent>::add_event(sim_time_t time,
 										  SimulationEvent event)
 {
-	calendar_map[time].push_back(event);
+	if (time >= current_time) {
+		calendar_map[time].push_back(event);
+
+#ifndef NDEBUG
+		std::cout << "I: Added event on time: " << time << std::endl;
+#endif
+	}
 }
 
 template <typename SimulationEvent>

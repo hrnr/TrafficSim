@@ -2,11 +2,9 @@ cmake_minimum_required (VERSION 2.6)
 
 # set default build (current Debug), user can override
 # must be before project
-IF(DEFINED CMAKE_BUILD_TYPE)
-   SET(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Choose the type of build.")
-ELSE()
-   SET(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build.")
-ENDIF()
+if(NOT CMAKE_BUILD_TYPE)
+   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
+endif()
 
 project (TrafficSim)
 

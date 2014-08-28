@@ -11,7 +11,7 @@ namespace Simulation
 class TrafficSimulation::Vehicle
 {
   public:
-	Vehicle(const TrafficSimulation &simulation, const std::string &from,
+	Vehicle(TrafficSimulation &simulation, const std::string &from,
 			const std::string &to, const sim_time_t &start_time,
 			const std::string &name = "unnamed_vehicle");
 	void update_status(const sim_time_t &current_time);
@@ -21,9 +21,10 @@ class TrafficSimulation::Vehicle
 	float traffic_increase_caused = 1;
 	// max speed in meters per second
 	uint_fast32_t max_speed = 22;
+
   private:
 	// simulation to live in
-	TrafficSimulation sim;
+	TrafficSimulation &sim;
 
 	// vehicle status
 	enum struct Status { READY, WAITING, ONROUTE, FINISHED };

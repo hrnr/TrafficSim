@@ -5,6 +5,7 @@
 #include <vector>
 #include <string.h>
 #include <cstdlib>
+#include <exception>
 
 Graph::CityGraph::CityGraph()
 {
@@ -43,14 +44,20 @@ void Graph::CityGraph::init_dynamic_property()
 void Graph::CityGraph::import(std::string dot_file)
 {
 	// file to import
-	std::ifstream dot_stream(dot_file);
+	std::ifstream dot_stream;
+	dot_stream.exceptions(std::ifstream::badbit);
+	try {
+		dot_stream.open(dot_file);
 
-	// import graphviz
-	bool status = boost::read_graphviz(dot_stream, city_graph, dprop);
-	dot_stream.close();
+		// import graphviz
+		bool status = boost::read_graphviz(dot_stream, city_graph, dprop);
 
-	if (!status) {
-		throw "Couldn't load graphviz file.";
+		if (!status) {
+			throw std::runtime_error("Couldn't parse graphviz file.");
+		}
+	} catch (const std::exception &e) {
+		std::cerr << "E: Unable to load " << dot_file << " " << e.what()
+				  << std::endl;
 	}
 }
 
@@ -86,7 +93,6 @@ std::string Graph::CityGraph::regenerate_dot()
 	// create/update dot tempfile from city_graph
 	std::fstream dot_tempfile_stream(dot_temp);
 	boost::write_graphviz_dp(dot_tempfile_stream, city_graph, dprop);
-	dot_tempfile_stream.close();
 
 	return dot_temp;
 }
@@ -101,7 +107,7 @@ Graph::CityGraph::find_node(std::string name)
 			return *vertex_it;
 		}
 	}
-	throw "Vertex " + name + "doesn't exist!";
+	throw std::runtime_error("Vertex '" + name + "' doesn't exist!");
 }
 
 std::list<Graph::CityGraph::edge_descriptor>

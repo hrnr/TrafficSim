@@ -1,9 +1,10 @@
 #include "vehicle.h"
 #include <algorithm>
+#include <iostream>
 
 namespace Simulation
 {
-TrafficSimulation::Vehicle::Vehicle(const TrafficSimulation &simulation,
+TrafficSimulation::Vehicle::Vehicle(TrafficSimulation &simulation,
 									const std::string &from,
 									const std::string &to,
 									const sim_time_t &start_time,
@@ -37,6 +38,8 @@ void TrafficSimulation::Vehicle::update_status(const sim_time_t &current_time)
 	// are we finished?
 	if (route_remaining.empty()) {
 		status = Status::FINISHED;
+		std::cout << "S [" << current_time << "]: Vehicle " << name
+				  << " finished" << std::endl;
 		return;
 	}
 
@@ -44,6 +47,8 @@ void TrafficSimulation::Vehicle::update_status(const sim_time_t &current_time)
 	status = Status::ONROUTE;
 	current_position = route_remaining.front();
 	route_remaining.pop_front();
+	std::cout << "S [" << current_time << "]: Vehicle " << name << " is now on "
+			  << sim.city_map[current_position].name << std::endl;
 
 	// increase traffic on next edge
 	sim.city_map[current_position].traffic += traffic_increase_caused;
@@ -59,7 +64,7 @@ sim_time_t TrafficSimulation::Vehicle::get_travelling_time(
 {
 	double length = sim.city_map[edge].length;
 	double ratio = std::max(1.0, (double)sim.city_map[edge].traffic /
-								   (sim.city_map[edge].capacity + 1));
+									 (sim.city_map[edge].capacity + 1));
 	double speed = std::min(max_speed, sim.city_map[edge].max_speed);
 
 	return (length / speed) * ratio;
