@@ -48,6 +48,8 @@ start_time**:**vehicle_name**:**from**:**to**:**_property1_=value**:**_property2
 ```
 Fields 1-4 are mandatory, ':' character is forbiden in fields. Supported properties are *traffic_increase_caused* (default: 1) and *max_speed* (default: 22). See [vehicles example](examples/vehicles.in).
 
+For generating this file simple [helper script](vehicles_helper.sh) is provided.
+
 ###Visualisation
 
 External viewer for dot files are required for visualisation. [xdot](https://github.com/jrfonseca/xdot.py) is recommended. If xdot is in your `PATH` visualisation should work out of the box, otherwise run TrafficSim with `-v path/to/xdot -f *graphviz_engine*`. You can adjust visualisation speed with `-t` option; eg.
