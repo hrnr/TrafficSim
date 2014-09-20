@@ -8,7 +8,7 @@ TrafficSim is simple traffic simulator created as university project. It simulat
 * non-uniform roads, non-uniform vehicles
 
 ##Building
-This project is written in standard C++11. It uses POSIX and Boost Graph Library. It should build fine on all POSIX systems, including mac. Windows are not supported (althought it should work fine with cygwin - link it with cygwin1.dll). Compilation tested with `boost 1.55` and both `gcc 4.9` and `clang 3.5`. Project uses [cmake](http://www.cmake.org/) as build system.
+This project is written in standard C++11. It uses POSIX and Boost Graph Library. It should build fine on all POSIX systems, including mac. Windows are not supported (although it should work fine with cygwin - link it with cygwin1.dll). Compilation tested with `boost 1.55` and both `gcc 4.9` and `clang 3.5`. Project uses [cmake](http://www.cmake.org/) as build system.
 
 0. get sources
 
