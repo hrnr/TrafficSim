@@ -22,6 +22,8 @@ class CityGraph
 
 		// design properties
 		std::string label;
+		std::string shape;
+		std::string position;
 	};
 	// edges in graph
 	struct Edge
@@ -31,14 +33,13 @@ class CityGraph
 		// how many vehicles can be there for fluent traffic
 		uint64_t capacity = 30;
 		// should be lenght in meters in real world
-		uint64_t length = 500;
+		double length = 500;
 		// how many norm vehicles in there
 		uint64_t traffic = 0;
 		// max speed in meters/second
 		uint64_t max_speed = 180;
 		// weight used for route planning
 		double weight = 1;
-		
 
 		// design properties
 		std::string color;
@@ -69,8 +70,8 @@ class CityGraph
 	vertex_descriptor find_node(std::string name);
 	std::list<edge_descriptor> get_route(vertex_descriptor from,
 										 vertex_descriptor to);
-	Vertex& operator[](vertex_descriptor vertex);
-	Edge& operator[](edge_descriptor edge);
+	Vertex &operator[](vertex_descriptor vertex);
+	Edge &operator[](edge_descriptor edge);
 
   private:
 	// main graph
@@ -82,6 +83,9 @@ class CityGraph
 
 	// init dynamic property mapping used for graphviz read/write
 	void init_dynamic_property();
+
+	// update weights for dijkstra
+	void update_weights();
 };
 }
 

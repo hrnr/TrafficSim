@@ -30,9 +30,10 @@ int main(int argc, char *const argv[])
 
 	// defaults
 	bool visualize = false;
-	int simulation_speed = 30;
+	int simulation_speed = 1;
 	std::string map_file;
 	std::string vehicles_file;
+	std::string dot_visualiser = "xdot -f neato";
 
 	// optarg vars
 	int c;
@@ -41,11 +42,16 @@ int main(int argc, char *const argv[])
 	extern int optind, optopt;
 
 	// parse options
-	while ((c = getopt(argc, argv, ":st:")) != -1) {
+	while ((c = getopt(argc, argv, ":st:v:")) != -1) {
 		switch (c) {
-		case 's':
+		case 's': // enable visualisation and search for xdot
 			std::cout << "I: Graphical visualisation is ON" << std::endl;
 			visualize = true;
+			break;
+		case 'v': // set dot visualiser
+			dot_visualiser = optarg;
+			std::cout << "I: Using '" << dot_visualiser
+					  << "' as DOT visualiser (default 'xdot -f neato')" << std::endl;
 			break;
 		case 't':
 			try {
@@ -92,14 +98,14 @@ int main(int argc, char *const argv[])
 
 	// print usage
 	if (errflg) {
-		std::cerr << "usage: TrafficSim [-s] [-t time_delay] <map> <vehicles>"
+		std::cerr << "usage: TrafficSim [-s] [-t time_delay] [-v dot_visualiser] <map> <vehicles>"
 				  << std::endl;
 		return 2;
 	}
 
 	// run simulation
 	Simulation::TrafficSimulation simulation(map_file, vehicles_file);
-	simulation.run(visualize, simulation_speed);
+	simulation.run(visualize, simulation_speed, dot_visualiser);
 
 	// Graph::CityGraph graph;
 	// graph.import("../pokus.dot");

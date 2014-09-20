@@ -19,11 +19,13 @@ TrafficSimulation::TrafficSimulation(std::string graph_in,
 	import_vehicles(vehicles_in);
 }
 
-void TrafficSimulation::run(const bool show_visualisation, const int &simulation_speed)
+void TrafficSimulation::run(const bool show_visualisation,
+							const int simulation_speed,
+							const std::string dot_visualiser)
 {
 	// show visualisation
 	if (show_visualisation) {
-		TrafficSimulation::show_visualisation();
+		TrafficSimulation::show_visualisation(dot_visualiser);
 	}
 
 	sim_time_t current_time = 0;
@@ -56,10 +58,9 @@ void TrafficSimulation::run(const bool show_visualisation, const int &simulation
 		sim_calendar.update_time(1);
 
 		// adjust simulation speed if visualizing
-		if (show_visualisation){
+		if (show_visualisation) {
 			std::this_thread::sleep_for(std::chrono::seconds(simulation_speed));
 		}
-
 	}
 
 	// finished
@@ -148,12 +149,11 @@ void TrafficSimulation::import_vehicles(std::string vehicles_file)
 	}
 }
 
-void TrafficSimulation::show_visualisation()
+void TrafficSimulation::show_visualisation(std::string dot_visualiser)
 {
 	// generates graph visualisation
 	std::string dot_temp = city_map.regenerate_dot();
 	// show it to user
-	system((std::string(DOT_VIEWER) + " " + dot_temp + "> /dev/null 2>&1 &")
-			   .c_str());
+	system((dot_visualiser + " " + dot_temp + "> /dev/null 2>&1 &").c_str());
 }
 }

@@ -1,6 +1,7 @@
 #include "vehicle.h"
 #include <algorithm>
 #include <iostream>
+#include <exception>
 
 namespace Simulation
 {
@@ -26,7 +27,7 @@ void TrafficSimulation::Vehicle::update_status(const sim_time_t &current_time)
 {
 	// this must be called only on proper times
 	if (current_time != next_position_at) {
-		throw "E: Simulation time mismatch";
+		throw std::runtime_error("E: Simulation time mismatch");
 	}
 
 	// decrease traffic on edge we are leaving

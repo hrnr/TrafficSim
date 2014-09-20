@@ -1,0 +1,45 @@
+digraph G
+{
+
+    Breitenanau [shape="rect",pos="139.01330, 50.786228"];
+    UstiNadLabem [shape="rect",pos="140.49645, 50.661037"];
+    Praha [shape="tripleoctagon",pos="144.39660, 50.065335"];
+    Plzen [shape="rect",pos="133.84973, 49.732732"];
+    Rozvadov [shape="rect",pos="125.17053, 49.640331"];
+    Brno [shape="rect",pos="166.14953, 49.190048"];
+    CeskeBudejovice [shape="rect",pos="144.72619, 48.974175"];
+    DolniDvoriste [shape="rect",pos="144.56139, 48.634086"];
+    Ostrava [shape="rect",pos="182.51916, 49.821414"];
+    Vernovice [shape="rect",pos="184.07152, 49.936281"];
+    HradecKralove [shape="rect",pos="158.34924, 50.202657"];
+
+    Breitenanau -> UstiNadLabem [name="D8.1",len="16000.7",max_speed="36",capacity="10000"];
+    UstiNadLabem -> Breitenanau [name="D8.1",len="16000.7",max_speed="36",capacity="10000"];
+
+    UstiNadLabem -> Praha [name="D8.2",len="61000.8",max_speed="36",capacity="10000"];
+    Praha -> UstiNadLabem [name="D8.2",len="61000.8",max_speed="36",capacity="10000"];
+
+    Praha -> Plzen [name="D5.1",len="75000.5",max_speed="36",capacity="10000"];
+    Plzen -> Praha [name="D5.1",len="75000.5",max_speed="36",capacity="10000"];
+
+    Plzen -> Rozvadov [name="D5.2",len="61000.8",max_speed="36",capacity="10000"];
+    Plzen -> Rozvadov [name="D5.2",len="61000.8",max_speed="36",capacity="10000"];
+
+    Praha -> Brno [name="D1.1",len="177000.1",max_speed="36",capacity="10000"];
+    Brno -> Praha [name="D1.1",len="177000.1",max_speed="36",capacity="10000"];
+
+    Praha -> CeskeBudejovice [name="D3.1",len="108000.3",max_speed="36",capacity="10000"];
+    CeskeBudejovice -> Praha [name="D3.1",len="108000.3",max_speed="36",capacity="10000"];
+
+    CeskeBudejovice -> DolniDvoriste [name="D3.2",len="36000.2",max_speed="36",capacity="10000"];
+    CeskeBudejovice -> DolniDvoriste [name="D3.2",len="36000.2",max_speed="36",capacity="10000"];
+
+    Brno -> Ostrava [name="D1.2",len="135000.0",max_speed="36",capacity="10000"];
+    Ostrava -> Brno [name="D1.2",len="135000.0",max_speed="36",capacity="10000"];
+
+    Ostrava -> Vernovice [name="D1.3",len="15000.6",max_speed="36",capacity="10000"];
+    Vernovice -> Ostrava [name="D1.3",len="15000.6",max_speed="36",capacity="10000"];
+
+    Praha -> HradecKralove [name="D11",len="87000.0",max_speed="36",capacity="10000"];
+    HradecKralove -> Praha [name="D11",len="87000.0",max_speed="36",capacity="10000"];
+}
